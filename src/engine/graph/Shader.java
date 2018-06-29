@@ -1,7 +1,9 @@
 package engine.graph;
 
+import javafx.scene.effect.Light;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
@@ -59,6 +61,48 @@ public class Shader {
         uniforms.put(uniformName, uniformLocation);
     }
 
+    public void createPointLightListUniforms(String uniformName, int size) throws Exception {
+        for (int i = 0; i < size; i++) {
+            createPointLightUniforms(uniformName + "[" + i + "]");
+        }
+    }
+
+    public void createPointLightUniforms(String uniformName) throws Exception {
+        createUniform(uniformName + ".colour");
+        createUniform(uniformName + ".position");
+        createUniform(uniformName + ".intensity");
+        createUniform(uniformName + ".att.constant");
+        createUniform(uniformName + ".att.linear");
+        createUniform(uniformName + ".att.exponent");
+    }
+
+    public void createSpotLightListUniforms(String uniformName, int size) throws Exception {
+        for (int i = 0; i < size; i++) {
+            createSpotLightUniforms(uniformName);
+        }
+    }
+
+    public void createSpotLightUniforms(String uniformName) throws Exception {
+        createPointLightUniforms(uniformName + ".pl");
+        createUniform(uniformName + ".conedir");
+        createUniform(uniformName + ".cutoff");
+    }
+
+    public void createDirectionalLightUniforms(String uniformName) throws Exception {
+        createUniform(uniformName + ".colour");
+        createUniform(uniformName + ".direction");
+        createUniform(uniformName + ".intensity");
+    }
+
+    public void createMaterialUniforms(String uniformName) throws Exception {
+        createUniform(uniformName + ".ambient");
+        createUniform(uniformName + ".diffuse");
+        createUniform(uniformName + ".specular");
+        createUniform(uniformName + ".hasTexture");
+        createUniform(uniformName + ".reflectance");
+    }
+
+
     public void setUniforms(String uniformName, Matrix4f value) {
         // use automated memory allocation
         try (MemoryStack memoryStack = MemoryStack.stackPush()) {
@@ -72,8 +116,68 @@ public class Shader {
         glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z);
     }
 
+    public void setUniforms(String uniformName, Vector4f value) {
+        glUniform4f(uniforms.get(uniformName), value.x, value.y, value.z, value.w);
+    }
+
     public void setUniforms(String uniformName, int value) {
         glUniform1i(uniforms.get(uniformName), value);
+    }
+
+    public void setUniforms(String uniformName, float value) {
+        glUniform1f(uniforms.get(uniformName), value);
+    }
+
+    public void setUniforms(String uniformName, PointLight[] pointLights) {
+        int numLights = pointLights != null ? pointLights.length : 0;
+        for (int i = 0; i < numLights; i++) {
+            setUniforms(uniformName, pointLights[i], i);
+        }
+    }
+
+    public void setUniforms(String uniformName, PointLight pointLight, int pos) {
+        setUniforms(uniformName + "[" + pos + "]", pointLight);
+    }
+
+    public void setUniforms(String uniformName, PointLight pointLight) {
+        setUniforms(uniformName + ".colour", pointLight.getColor());
+        setUniforms(uniformName + ".position", pointLight.getPosition());
+        setUniforms(uniformName + ".intensity", pointLight.getIntensity());
+        PointLight.Attenuation att = pointLight.getAttenuation();
+        setUniforms(uniformName + ".att.constant", att.getConstant());
+        setUniforms(uniformName + ".att.linear", att.getLinear());
+        setUniforms(uniformName + ".att.exponent", att.getExponent());
+    }
+
+    public void setUniforms(String uniformName, SpotLight spotLight) {
+        setUniforms(uniformName + ".pl", spotLight.getPointLight());
+        setUniforms(uniformName + ".conedir", spotLight.getConeDirection());
+        setUniforms(uniformName + ".cutoff", spotLight.getCutOff());
+    }
+
+    public void setUniforms(String uniformName, DirectionalLight dirLight) {
+        setUniforms(uniformName + ".colour", dirLight.getColor() );
+        setUniforms(uniformName + ".direction", dirLight.getDirection());
+        setUniforms(uniformName + ".intensity", dirLight.getIntensity());
+    }
+
+    public void setUniforms(String uniformName, SpotLight[] spotLights) {
+        int numLights = spotLights != null ? spotLights.length : 0;
+        for (int i = 0; i < numLights; i++) {
+            setUniforms(uniformName, spotLights[i], i);
+        }
+    }
+
+    public void setUniforms(String uniformName, SpotLight spotLight, int pos) {
+        setUniforms(uniformName + "[" + pos + "]", spotLight);
+    }
+
+    public void setUniforms(String uniformName, Material material) {
+        setUniforms(uniformName + ".ambient", material.getAmbientColour());
+        setUniforms(uniformName + ".diffuse", material.getDiffuseColour());
+        setUniforms(uniformName + ".specular", material.getSpecularColour());
+        setUniforms(uniformName + ".hasTexture", material.isTextured() ? 1 : 0);
+        setUniforms(uniformName + ".reflectance", material.getReflectance());
     }
 
     public void link() throws Exception {

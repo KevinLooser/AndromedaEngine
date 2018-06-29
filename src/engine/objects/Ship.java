@@ -16,17 +16,17 @@ public class Ship extends GameObject {
     private float width = 2f;
 
     public Ship(Mesh mesh, Mesh frontMesh, Mesh broadsidesMesh) {
-        super(mesh);
-        this.frontWeapon = new Front(Module.ModPosition.FRONT, 0, 0, frontMesh);
-        this.broadsidesWeapon = new Broadsides(Module.ModPosition.BROADSIDES, 0, 10f, 3, 1f, broadsidesMesh);
+        super(mesh, 3f);
+        this.frontWeapon = new Front(Module.ModPosition.FRONT, 0, frontMesh);
+        this.broadsidesWeapon = new Broadsides(Module.ModPosition.BROADSIDES, 0, 3, 1f, broadsidesMesh);
         this.gear = new Gear(Module.ModPosition.DECK, 0);
         this.thruster = new Thruster(Module.ModPosition.THRUSTERS, 0);
     }
 
     public Ship(Mesh mesh, Mesh frontMesh, Mesh broadsidesMesh, float speed, float acceleration, float durability) {
-        super(mesh, speed, acceleration, durability);
-        this.frontWeapon = new Front(Module.ModPosition.FRONT, 0, 0, frontMesh);
-        this.broadsidesWeapon = new Broadsides(Module.ModPosition.BROADSIDES, 0, 7f, 2, 1f, broadsidesMesh);
+        super(mesh, 4f, speed, acceleration, durability);
+        this.frontWeapon = new Front(Module.ModPosition.FRONT, 0, frontMesh);
+        this.broadsidesWeapon = new Broadsides(Module.ModPosition.BROADSIDES, 0, 2, 1f, broadsidesMesh);
         this.gear = new Gear(Module.ModPosition.DECK, 0);
         this.thruster = new Thruster(Module.ModPosition.THRUSTERS, 0);
     }

@@ -16,8 +16,8 @@ public class Broadsides extends Weapon {
         LEFT, RIGHT
     }
 
-    public Broadsides(ModPosition position, float interval, float range, int amount, float spread, Mesh mesh) {
-        super(position, interval, range, mesh);
+    public Broadsides(ModPosition position, float interval, int amount, float spread, Mesh mesh) {
+        super(position, interval, mesh);
         this.amount = amount;
         this.spread = spread;
     }
@@ -35,7 +35,7 @@ public class Broadsides extends Weapon {
 
         for(int i = 0; i < amount; i++) {
             for(int j = -1; j <= 1; j++) {
-                Missile missile = new Missile(super.mesh, 0.6f, 0.08f);
+                Missile missile = new Missile(super.mesh, 0.2f, 0.6f, 20f, 0.08f);
                 float sideRotation = 0;
                 float sideOffset = 0;
                 switch (side) {
@@ -54,6 +54,7 @@ public class Broadsides extends Weapon {
                 offsetZ = (float) Math.cos(Math.toRadians(rotation.y)) * distance;
 
                 missile.setPosition(firstPosition.x + offsetX, firstPosition.y, firstPosition.z + offsetZ);
+                missile.setOrigin(position.x, position.y, position.z);
                 missile.setRotation(rotation.x, rotation.y + sideRotation + (spread * j), rotation.z);
                 missile.setScale(0.1f);
                 missiles.add(missile);

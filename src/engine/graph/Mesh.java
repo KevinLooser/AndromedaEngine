@@ -2,6 +2,7 @@ package engine.graph;
 
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
+import org.w3c.dom.Text;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -17,12 +18,10 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Mesh {
 
-    private static final Vector3f DEFAULT_COLOUR = new Vector3f(1.0f, 1.0f, 1.0f);
     private final int vaoId;
     private final List<Integer> vboIdList;
     private final int vertexCount;
-    private Texture texture;
-    private Vector3f colour;
+    private Material material;
 
     public Mesh(float[] positions, float[] textureCoordinates, float[] normals, int[] indices) {
 
@@ -33,7 +32,6 @@ public class Mesh {
 
         // manually manage buffer. VITAL: free memory after operation
         try {
-            colour = DEFAULT_COLOUR;
             vertexCount = indices.length;
             vboIdList = new ArrayList<>();
 
@@ -96,7 +94,7 @@ public class Mesh {
             }
         }
     }
-
+/*
     public boolean isTextured() {
         return this.texture != null;
     }
@@ -107,15 +105,23 @@ public class Mesh {
 
     public void setTexture(Texture texture) {
         this.texture = texture;
+    }*/
+
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 
+    public Material getMaterial() {
+        return material;
+    }
+/*
     public void setColour(Vector3f colour) {
         this.colour = colour;
     }
 
     public Vector3f getColour() {
         return colour;
-    }
+    }*/
 
     public int getVaoId() {
         return vaoId;
@@ -126,6 +132,7 @@ public class Mesh {
     }
 
     public void render() {
+        Texture texture = material.getTexture();
         if (texture != null) {
             // Activate firs texture bank
             glActiveTexture(GL_TEXTURE0);
@@ -159,8 +166,23 @@ public class Mesh {
         }
 
         // Delete the texture
+        Texture texture = material.getTexture();
         if (texture != null) {
             texture.cleanup();
+        }
+
+        // Delete the VAO
+        glBindVertexArray(0);
+        glDeleteVertexArrays(vaoId);
+    }
+
+    public void deleteBuffers() {
+        glDisableVertexAttribArray(0);
+
+        // Delete the VBO
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        for(int vboId : vboIdList) {
+            glDeleteBuffers(vboId);
         }
 
         // Delete the VAO

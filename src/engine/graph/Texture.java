@@ -8,7 +8,9 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 public class Texture {
 
     private final int id;
+
     private final int width;
+
     private final int height;
 
     public Texture(String fileName) throws Exception {
@@ -42,6 +44,9 @@ public class Texture {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this.width, this.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
         // Generate Mip Map
         glGenerateMipmap(GL_TEXTURE_2D);
+        // manage text scaling
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
 
     public int getWidth() {
