@@ -1,6 +1,8 @@
 package game;
 
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
 
 import engine.IHud;
 import engine.Window;
@@ -15,27 +17,39 @@ public class Hud implements IHud {
 
     private static final String CHARSET = "ISO-8859-1";
 
-    private final GameObject[] gameItems;
+    private final List<GameObject> gameObjects;
 
     private final TextItem statusTextItem;
 
+    private FontTexture fontTexture;
+
     public Hud(String statusText) throws Exception {
-        FontTexture fontTexture = new FontTexture(FONT, CHARSET);
+        fontTexture = new FontTexture(FONT, CHARSET);
         this.statusTextItem = new TextItem(statusText, fontTexture);
         this.statusTextItem.setPosition(1, 1, 0);
         this.statusTextItem.getMesh().getMaterial().setAmbientColour(new Vector4f(1, 1, 1, 1));
 
         // Create list that holds the items that compose the HUD
-        gameItems = new GameObject[]{statusTextItem};
+        gameObjects = new ArrayList<>();
+        gameObjects.add(statusTextItem);
     }
 
     public void setStatusText(String statusText) {
         this.statusTextItem.setText(statusText);
     }
 
+    public void addStatusText(String statusText) throws Exception {
+        TextItem textItem = new TextItem(statusText, fontTexture);
+        gameObjects.add(textItem);
+    }
+
+    public void setStatusText(String statusText, TextItem textItem) {
+        textItem.setText(statusText);
+    }
+
     @Override
-    public GameObject[] getGameItems() {
-        return gameItems;
+    public List<GameObject> getGameObjects() {
+        return gameObjects;
     }
 
     public void updateSize(Window window) {

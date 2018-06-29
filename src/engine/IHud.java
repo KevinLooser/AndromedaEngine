@@ -2,13 +2,15 @@ package engine;
 
 import engine.objects.GameObject;
 
+import java.util.List;
+
 public interface IHud {
 
-    GameObject[] getGameItems();
+    List<GameObject> getGameObjects();
 
     default void cleanup() {
-        GameObject[] gameItems = getGameItems();
-        for (GameObject gameObject : gameItems) {
+        List<GameObject> gameObjects = getGameObjects();
+        for (GameObject gameObject : gameObjects) {
             gameObject.getMesh().cleanup();
         }
     }

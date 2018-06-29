@@ -130,4 +130,16 @@ public class GameObject {
     public LifeState getLifeState() {
         return lifeState;
     }
+
+    public float getDurability() {
+        return durability;
+    }
+
+    public void setDurability(float durability) {
+        this.durability = durability;
+    }
+
+    public void dealDamage(float damage) {
+        durability -= damage;
+    }
 }
