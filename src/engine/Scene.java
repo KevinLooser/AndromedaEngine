@@ -11,7 +11,6 @@ import java.util.Map;
 public class Scene {
 
     private Map<Mesh, List<GameObject>> meshMap;
-    private List<GameObject> gameObjects;
     private SkyBox skyBox;
     private SceneLight sceneLight;
 
@@ -33,14 +32,6 @@ public class Scene {
             }
             list.add(gameObject);
         }
-    }
-
-    public List<GameObject> getGameObjects() {
-        return gameObjects;
-    }
-
-    public void setGameObjects(List<GameObject> gameObjects) {
-        this.gameObjects = gameObjects;
     }
 
     public SkyBox getSkyBox() {

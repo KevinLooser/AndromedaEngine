@@ -1,5 +1,6 @@
 package engine.graph;
 
+import engine.objects.GameObject;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 import org.w3c.dom.Text;
@@ -8,6 +9,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -94,18 +96,6 @@ public class Mesh {
             }
         }
     }
-/*
-    public boolean isTextured() {
-        return this.texture != null;
-    }
-
-    public Texture getTexture() {
-        return this.texture;
-    }
-
-    public void setTexture(Texture texture) {
-        this.texture = texture;
-    }*/
 
     public void setMaterial(Material material) {
         this.material = material;
@@ -114,14 +104,6 @@ public class Mesh {
     public Material getMaterial() {
         return material;
     }
-/*
-    public void setColour(Vector3f colour) {
-        this.colour = colour;
-    }
-
-    public Vector3f getColour() {
-        return colour;
-    }*/
 
     public int getVaoId() {
         return vaoId;
@@ -131,7 +113,7 @@ public class Mesh {
         return vertexCount;
     }
 
-    public void render() {
+    private void initRender() {
         Texture texture = material.getTexture();
         if (texture != null) {
             // Activate firs texture bank
@@ -145,15 +127,30 @@ public class Mesh {
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
+    }
 
-        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
-
+    private void endRender() {
         // restore state
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    public void render() {
+        initRender();
+        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+        endRender();
+    }
+
+    public void renderList(List<GameObject> gameObjects, Consumer<GameObject> consumer) {
+        initRender();
+
+        for (GameObject gameObject : gameObjects) {
+            consumer.accept(gameObject);
+            glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+        }
     }
 
     public void cleanup() {

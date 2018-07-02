@@ -44,11 +44,11 @@ public class ThirdPersonCamera extends Camera {
         rotation.y = 180 - theta;
     }
 
-    public void moveVertically(float offsetX) {
+    private void moveVertically(float offsetX) {
         rotation.x += offsetX;
     }
 
-    public void moveHorizontally(float offsetY) {
+    private void moveHorizontally(float offsetY) {
         angle -= offsetY;
     }
 }

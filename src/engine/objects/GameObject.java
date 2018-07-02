@@ -112,6 +112,22 @@ public class GameObject {
         this.rotation.z = z;
     }
 
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setAcceleration(float acceleration) {
+        this.acceleration = acceleration;
+    }
+
+    public float getAcceleration() {
+        return acceleration;
+    }
+
     public void setMesh(Mesh mesh) {
         this.mesh = mesh;
     }

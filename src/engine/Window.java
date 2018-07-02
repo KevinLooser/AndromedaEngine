@@ -17,12 +17,14 @@ public class Window {
     private long windowHandle;
     private boolean resized;
     private boolean vSync;
+    private boolean debugMode;
 
     public Window(String title, int width, int height, boolean vSync) {
         this.title = title;
         this.width = width;
         this.height = height;
         this.vSync = vSync;
+        debugMode = false;
     }
 
     public void init() {
@@ -81,7 +83,14 @@ public class Window {
         // set the clear color
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glEnable(GL_DEPTH_TEST);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        if(isDebugMode()) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        } else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+
 
         // Support for transparencies
         glEnable(GL_BLEND);
@@ -138,6 +147,14 @@ public class Window {
 
     public long getWindowHandle() {
         return windowHandle;
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+
+    public boolean isDebugMode() {
+        return debugMode;
     }
 
     public void update() {

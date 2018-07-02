@@ -8,6 +8,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static engine.objects.GameObject.LifeState.DEAD;
 import static org.lwjgl.glfw.GLFW.*;
@@ -17,6 +18,11 @@ public class DemoGame implements IGameLogic {
     private final Renderer renderer;
 
     private static final float SHIP_ACCELERATION = 0.001f;
+
+    List<GameObject> gameObjects;
+    GameObject player;
+    ObstacleGroup obstacles;
+    MissileGroup missiles;
 
     private Scene scene;
     private ThirdPersonCamera camera;
@@ -42,7 +48,6 @@ public class DemoGame implements IGameLogic {
 
         // load meshes
         Mesh mesh = OBJLoader.loadMesh("../resources/models/cube.obj");
-        //mesh.setTexture(texture);
         mesh.setMaterial(asteroidMaterial);
 
         Mesh missileMesh = OBJLoader.loadMesh("../resources/models/missile.obj");
@@ -61,25 +66,75 @@ public class DemoGame implements IGameLogic {
         GameObject ship = new Ship(shipMesh, missileMesh, missileMesh, 0, SHIP_ACCELERATION, 1);
         GameObject asteroid = new Obstacle(mesh, 1f);
         asteroid.setDurability(100.0f);
-        GameObject plane = new Obstacle(mesh, 1f);
         asteroid.setPosition(-4, 0, -1);
-        plane.setPosition(0, -5, 0);
         ship.setPosition(0, 0, -cameraDistance);
 
         // add game objects
-        List<GameObject> gameObjects = new ArrayList<>();
+        gameObjects = new ArrayList<>();
         gameObjects.add(ship);
         gameObjects.add(asteroid);
-        gameObjects.add(plane);
         gameObjects.add(skyBox);
-        scene.setGameObjects(gameObjects);
+        scene.setGameObjectsMeshes(gameObjects);
         camera.init(ship, cameraDistance);
 
+        // add player
+        player = ship;
+
+        // add obstacles
+        obstacles = new ObstacleGroup();
+        obstacles.add((Obstacle) asteroid);
+
+        // prepare missiles
+        missiles = new MissileGroup();
+
         // lights
+        setupLights();
+
+        // create hud
+        setupHud();
+
+    }
+
+    @Override
+    public void input(Window window, MouseInput mouseInput) {
+        if (window.isKeyPressed(GLFW_KEY_W)) {
+            player.accelerate();
+        } else if (window.isKeyPressed(GLFW_KEY_S)) {
+            player.decelerate();
+        }
+        if (window.isKeyPressed(GLFW_KEY_A)) {
+            ((Ship) player).steer(-1);
+        } else if (window.isKeyPressed(GLFW_KEY_D)) {
+            ((Ship) player).steer(1);
+        }
+        if (window.isKeyPressed(GLFW_KEY_F)) {
+            Missile missile = ((Ship) player).shootFrontal();
+            gameObjects.add(missile);
+            missiles.add(missile);
+        }
+        if (window.isKeyPressed(GLFW_KEY_Q)) {
+            List<Missile> missileListLeft = ((Ship) player).shootLeftSide();
+            gameObjects.addAll(missileListLeft);
+            missiles.addAll(missileListLeft);
+        }
+        if (window.isKeyPressed(GLFW_KEY_E)) {
+            List<Missile> missileListRight = ((Ship) player).shootRightSide();
+            gameObjects.addAll(missileListRight);
+            missiles.addAll(missileListRight);
+        }
+        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+            // TODO: activate boost
+        }
+        if (window.isKeyPressed(GLFW_KEY_SPACE)) {
+            // TODO: activate gear
+        }
+    }
+
+    private void setupLights() {
         SceneLight sceneLight = new SceneLight();
         sceneLight.setAmbientLight(new Vector3f(0.8f, 0.8f, 0.8f));
         Vector3f lightColour = new Vector3f(1, 1, 1);
-        Vector3f lightPosition = new Vector3f(0, 0, 1);
+        Vector3f lightPosition = new Vector3f(1, 0, 0);
         float lightIntensity = 1.0f;
         // point light
         sceneLight.setPointLightList(new PointLight[0]);
@@ -88,49 +143,57 @@ public class DemoGame implements IGameLogic {
         // directional light
         sceneLight.setDirectionalLight(new DirectionalLight(lightColour, lightPosition, lightIntensity));
         scene.setSceneLight(sceneLight);
-
-        // create hud
-        hud = new Hud("AndromedaEngine v0.12");
-        hud.addStatusText("Asteroid Durability: " + scene.getGameObjects().get(1).getDurability());
-        hud.getGameObjects().get(1).setPosition(1, 10, 0);
     }
 
-    @Override
-    public void input(Window window, MouseInput mouseInput) {
-        if (window.isKeyPressed(GLFW_KEY_W)) {
-            scene.getGameObjects().get(0).accelerate();
-        } else if (window.isKeyPressed(GLFW_KEY_S)) {
-            scene.getGameObjects().get(0).decelerate();
-        }
-        if (window.isKeyPressed(GLFW_KEY_A)) {
-            ((Ship) scene.getGameObjects().get(0)).steer(-1);
-        } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            ((Ship) scene.getGameObjects().get(0)).steer(1);
-        }
-        if (window.isKeyPressed(GLFW_KEY_F)) {
-            scene.getGameObjects().add(((Ship) scene.getGameObjects().get(0)).shootFrontal());
-        }
-        if (window.isKeyPressed(GLFW_KEY_Q)) {
-            scene.getGameObjects().addAll(((Ship) scene.getGameObjects().get(0)).shootLeftSide());
-        }
-        if (window.isKeyPressed(GLFW_KEY_E)) {
-            scene.getGameObjects().addAll(((Ship) scene.getGameObjects().get(0)).shootRightSide());
-        }
+    private void setupHud() throws Exception {
+        hud = new Hud("AndromedaEngine v0.12");
+        hud.addStatusText("Asteroid Durability: " + gameObjects.get(1).getDurability());
+        hud.getGameObjects().get(1).setPosition(5, 10, 0);
     }
 
     @Override
     public void update(float interval, MouseInput mouseInput) {
         camera.moveAlong(mouseInput);
-        scene.getSkyBox().moveAlong(scene.getGameObjects().get(0).getPosition().x, scene.getGameObjects().get(0).getPosition().y, scene.getGameObjects().get(0).getPosition().z);
-        for(int i = 0; i < scene.getGameObjects().size(); i++) {
-            scene.getGameObjects().get(i).moveForward();
-            if(scene.getGameObjects().get(i).getClass() == Missile.class && (scene.getGameObjects().get(i).collides(scene.getGameObjects().get(1)) || ((Missile) scene.getGameObjects().get(i)).isExhausted())){
-                scene.getGameObjects().get(i).destroy();
-                scene.getGameObjects().get(1).dealDamage(((Missile)  scene.getGameObjects().get(i)).getDamage());
-                hud.setStatusText("Asteroid Durability: " + scene.getGameObjects().get(1).getDurability(), (TextItem) hud.getGameObjects().get(1));
-                if(scene.getGameObjects().get(i).getLifeState() == DEAD) {
-                    scene.getGameObjects().remove(i);
-                    i--;
+        scene.getSkyBox().moveAlong(player.getPosition().x, player.getPosition().y, player.getPosition().z);
+
+        updateAll();
+        updateMissiles();
+
+        scene.getGameMeshes().clear();
+        scene.setGameObjectsMeshes(gameObjects);
+    }
+
+    private void updateAll() {
+        for(int i = 0; i < gameObjects.size(); i++) {
+            gameObjects.get(i).moveForward();
+            if(gameObjects.get(i).getLifeState() == DEAD) {
+                gameObjects.remove(i);
+                i--;
+            }
+        }
+    }
+
+    private void updateMissiles() {
+        for(int j = 0; j < missiles.size(); j++) {
+            Missile currentMissile = missiles.get(j);
+            if(currentMissile.isExhausted()) {
+                currentMissile.destroy();
+                missiles.remove(j);
+                j--;
+            }
+            for (int k = 0; k < obstacles.size(); k++) {
+                Obstacle currentObstacle = obstacles.get(k);
+                if(currentMissile.collides(currentObstacle)) {
+                    currentObstacle.dealDamage(currentMissile.getDamage());
+                    currentMissile.destroy();
+                    missiles.remove(j);
+                    j--;
+                }
+                hud.setStatusText("Asteroid Durability: " + currentObstacle.getDurability(), (TextItem) hud.getGameObjects().get(1));
+                if(currentObstacle.getDurability() <= 0) {
+                    currentObstacle.destroy();
+                    obstacles.remove(k);
+                    k--;
                 }
             }
         }
@@ -145,8 +208,9 @@ public class DemoGame implements IGameLogic {
     @Override
     public void cleanup() {
         renderer.cleanup();
-        for (GameObject gameObject : scene.getGameObjects()) {
-            gameObject.getMesh().cleanup();
+        Map<Mesh, List<GameObject>> mapMeshes = scene.getGameMeshes();
+        for (Mesh mesh : mapMeshes.keySet()) {
+            mesh.cleanup();
         }
         hud.cleanup();
     }

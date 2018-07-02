@@ -17,16 +17,16 @@ public class Ship extends GameObject {
 
     public Ship(Mesh mesh, Mesh frontMesh, Mesh broadsidesMesh) {
         super(mesh, 3f);
-        this.frontWeapon = new Front(Module.ModPosition.FRONT, 0, frontMesh);
-        this.broadsidesWeapon = new Broadsides(Module.ModPosition.BROADSIDES, 0, 3, 1f, broadsidesMesh);
+        this.frontWeapon = new Front(Module.ModPosition.FRONT, 0, length, frontMesh);
+        this.broadsidesWeapon = new Broadsides(Module.ModPosition.BROADSIDES, 1, 3, 1f, broadsidesMesh);
         this.gear = new Gear(Module.ModPosition.DECK, 0);
         this.thruster = new Thruster(Module.ModPosition.THRUSTERS, 0);
     }
 
     public Ship(Mesh mesh, Mesh frontMesh, Mesh broadsidesMesh, float speed, float acceleration, float durability) {
         super(mesh, 4f, speed, acceleration, durability);
-        this.frontWeapon = new Front(Module.ModPosition.FRONT, 0, frontMesh);
-        this.broadsidesWeapon = new Broadsides(Module.ModPosition.BROADSIDES, 0, 2, 1f, broadsidesMesh);
+        this.frontWeapon = new Front(Module.ModPosition.FRONT, 0, length, frontMesh);
+        this.broadsidesWeapon = new Broadsides(Module.ModPosition.BROADSIDES, 1, 3, 1f, broadsidesMesh);
         this.gear = new Gear(Module.ModPosition.DECK, 0);
         this.thruster = new Thruster(Module.ModPosition.THRUSTERS, 0);
     }
@@ -36,26 +36,22 @@ public class Ship extends GameObject {
     }
 
     public Missile shootFrontal() {
-        Missile missile = ((Front) frontWeapon).load(getPosition(), getRotation());
-        System.out.println("Missile released.");
-        return missile;
+        return ((Front) frontWeapon).load(getPosition(), getRotation());
     }
 
     public List<Missile> shootLeftSide() {
-        List<Missile> missiles = ((Broadsides) broadsidesWeapon).load(getPosition(), getRotation(), length, width, Broadsides.Side.LEFT);
-        return missiles;
+        return ((Broadsides) broadsidesWeapon).load(getPosition(), getRotation(), length, width, Broadsides.Side.LEFT);
     }
 
     public List<Missile> shootRightSide() {
-        List<Missile> missiles = ((Broadsides) broadsidesWeapon).load(getPosition(), getRotation(), length, width, Broadsides.Side.RIGHT);
-        return missiles;
+        return ((Broadsides) broadsidesWeapon).load(getPosition(), getRotation(), length, width, Broadsides.Side.RIGHT);
     }
 
     public void boost() {
-
+        // TODO: movement speed boost with a magnitude and duration
     }
 
     public void useGear() {
-
+        // TODO: effect (eg. shield) with magnitude and duration
     }
 }
