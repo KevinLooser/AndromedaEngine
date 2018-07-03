@@ -19,10 +19,11 @@ public class DemoGame implements IGameLogic {
 
     private static final float SHIP_ACCELERATION = 0.001f;
 
-    List<GameObject> gameObjects;
-    GameObject player;
-    ObstacleGroup obstacles;
-    MissileGroup missiles;
+    private List<GameObject> gameObjects;
+    private GameObject player;
+    private ShipGroup ships;
+    private ObstacleGroup obstacles;
+    private MissileGroup missiles;
 
     private Scene scene;
     private ThirdPersonCamera camera;
@@ -47,23 +48,28 @@ public class DemoGame implements IGameLogic {
         Material missileMaterial = new Material(texture, reflectance);
 
         // load meshes
-        Mesh mesh = OBJLoader.loadMesh("../resources/models/cube.obj");
+        Mesh mesh = OBJLoader.loadMesh("/resources/models/cube.obj");
         mesh.setMaterial(asteroidMaterial);
 
-        Mesh missileMesh = OBJLoader.loadMesh("../resources/models/missile.obj");
+        Mesh missileMesh = OBJLoader.loadMesh("/resources/models/missile.obj");
         missileMesh.setMaterial(missileMaterial);
 
-        Mesh shipMesh = OBJLoader.loadMesh("../resources/models/ship.obj");
+        Mesh shipMesh2 = OBJLoader.loadMesh("/resources/models/ship.obj");
+        shipMesh2.setMaterial(shipMaterial);
+        Mesh shipMesh = OBJLoader.loadMesh("/resources/models/stardestroyer.obj");
         shipMesh.setMaterial(shipMaterial);
 
         // skybox
-        SkyBox skyBox = new SkyBox("../resources/models/skybox.obj", "/resources/textures/skybox.png");
+        SkyBox skyBox = new SkyBox("/resources/models/skybox.obj", "/resources/textures/skybox.png");
         skyBox.setScale(50f);
         scene.setSkyBox(skyBox);
 
         // create game objects
         float cameraDistance = 7f;
-        GameObject ship = new Ship(shipMesh, missileMesh, missileMesh, 0, SHIP_ACCELERATION, 1);
+        GameObject ship = new Ship(shipMesh, missileMesh, missileMesh, 0, SHIP_ACCELERATION, 20);
+        GameObject enemyShip = new Ship(shipMesh2, missileMesh, missileMesh, 0, SHIP_ACCELERATION, 60);
+        enemyShip.setPosition(-2f, 0f, -4f);
+        enemyShip.setRadius(2f);
         GameObject asteroid = new Obstacle(mesh, 1f);
         asteroid.setDurability(100.0f);
         asteroid.setPosition(-4, 0, -1);
@@ -72,12 +78,16 @@ public class DemoGame implements IGameLogic {
         // add game objects
         gameObjects = new ArrayList<>();
         gameObjects.add(ship);
+        gameObjects.add(enemyShip);
         gameObjects.add(asteroid);
         gameObjects.add(skyBox);
         scene.setGameObjectsMeshes(gameObjects);
         camera.init(ship, cameraDistance);
 
-        // add player
+        // add player and ships
+        ships = new ShipGroup();
+        ships.add((Ship) enemyShip);
+        ships.add((Ship) ship);
         player = ship;
 
         // add obstacles
@@ -93,6 +103,27 @@ public class DemoGame implements IGameLogic {
         // create hud
         setupHud();
 
+    }
+
+    private void setupLights() {
+        SceneLight sceneLight = new SceneLight();
+        sceneLight.setAmbientLight(new Vector3f(0.8f, 0.8f, 0.8f));
+        Vector3f lightColour = new Vector3f(1, 1, 1);
+        Vector3f lightPosition = new Vector3f(1, 0, 0);
+        float lightIntensity = 1.0f;
+        // point light
+        sceneLight.setPointLightList(new PointLight[0]);
+        // spot light
+        sceneLight.setSpotLightList(new SpotLight[0]);
+        // directional light
+        sceneLight.setDirectionalLight(new DirectionalLight(lightColour, lightPosition, lightIntensity));
+        scene.setSceneLight(sceneLight);
+    }
+
+    private void setupHud() throws Exception {
+        hud = new Hud("AndromedaEngine v0.12");
+        hud.addStatusText("Asteroid Durability: " + gameObjects.get(1).getDurability());
+        hud.getGameObjects().get(1).setPosition(5, 10, 0);
     }
 
     @Override
@@ -128,27 +159,6 @@ public class DemoGame implements IGameLogic {
         if (window.isKeyPressed(GLFW_KEY_SPACE)) {
             // TODO: activate gear
         }
-    }
-
-    private void setupLights() {
-        SceneLight sceneLight = new SceneLight();
-        sceneLight.setAmbientLight(new Vector3f(0.8f, 0.8f, 0.8f));
-        Vector3f lightColour = new Vector3f(1, 1, 1);
-        Vector3f lightPosition = new Vector3f(1, 0, 0);
-        float lightIntensity = 1.0f;
-        // point light
-        sceneLight.setPointLightList(new PointLight[0]);
-        // spot light
-        sceneLight.setSpotLightList(new SpotLight[0]);
-        // directional light
-        sceneLight.setDirectionalLight(new DirectionalLight(lightColour, lightPosition, lightIntensity));
-        scene.setSceneLight(sceneLight);
-    }
-
-    private void setupHud() throws Exception {
-        hud = new Hud("AndromedaEngine v0.12");
-        hud.addStatusText("Asteroid Durability: " + gameObjects.get(1).getDurability());
-        hud.getGameObjects().get(1).setPosition(5, 10, 0);
     }
 
     @Override
@@ -194,6 +204,16 @@ public class DemoGame implements IGameLogic {
                     currentObstacle.destroy();
                     obstacles.remove(k);
                     k--;
+                }
+            }
+            for (int s = 0; s < ships.size(); s++) {
+                Ship currentShip = ships.get(s);
+                if(currentMissile.collides(currentShip)) {
+                    currentShip.getDurability();
+                    currentShip.dealDamage(currentMissile.getDamage());
+                    currentMissile.destroy();
+                    ships.remove(s);
+                    s--;
                 }
             }
         }

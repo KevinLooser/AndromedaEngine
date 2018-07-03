@@ -12,7 +12,7 @@ public class GameObject {
     protected final Vector3f position;
     protected float scale;
     protected final Vector3f rotation;
-    protected final float radius;
+    protected float radius;
     protected LifeState lifeState = ALIVE;
 
     protected float speed;
@@ -74,6 +74,10 @@ public class GameObject {
         if (speed < 0) {
             speed = 0;
         }
+    }
+
+    public void setRadius(float radius) {
+        this.radius = radius;
     }
 
     public boolean collides(GameObject collidingObj) {

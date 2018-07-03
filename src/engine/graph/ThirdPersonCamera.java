@@ -6,19 +6,22 @@ import org.joml.Vector2f;
 
 public class ThirdPersonCamera extends Camera {
 
-    private GameObject person;
+    private GameObject actor;
     private static final float MOUSE_SENSITIVITY = 0.2f;
     private float distance;
-    private float angle;
+    private float angleAroundActor;
 
-    public void init(GameObject person, float distance) {
-        this.person = person;
+    public void init(GameObject actor, float distance) {
+        this.actor = actor;
         this.distance = distance;
-        angle = 0;
+        angleAroundActor = 0;
+    }
+
+    public void changeDistance(float offset) {
+        distance += offset;
     }
 
     public void moveAlong(MouseInput mouseInput) {
-
         // manually move camera around person
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
@@ -26,19 +29,33 @@ public class ThirdPersonCamera extends Camera {
             moveVertically(rotVec.x * MOUSE_SENSITIVITY);
         }
 
+        float scrollOffset = mouseInput.getScrollDiff();
+        scrollOffset *= 0.3;
+        if(distance >= 3f && distance <= 12f) {
+            distance -= scrollOffset;
+            if(distance < 3f) {
+                distance = 3f;
+            } else if (distance > 12f) {
+                distance = 12f;
+            }
+        }
+        mouseInput.resetScrollDiff();
+
         // calculate y
         float horizontalDistance = (float) (distance * Math.cos(Math.toRadians(rotation.x)));
         float verticalDistance = (float) (distance * Math.sin(Math.toRadians(rotation.x)));
 
         // calculate z and x distance from camera
-        float theta = person.getRotation().y + angle;
+        float theta = angleAroundActor;
+        // this is disabled because it causes stuttering
+        //float theta =  angleAroundActor - actor.getRotation().y;
         float offsetX = (float) (horizontalDistance * Math.sin(Math.toRadians(theta)));
         float offsetZ = (float) (horizontalDistance * Math.cos(Math.toRadians(theta)));
 
         // calculate the camera position
-        position.x = person.getPosition().x - offsetX;
-        position.y = person.getPosition().y + verticalDistance;
-        position.z = person.getPosition().z - offsetZ;
+        position.x = actor.getPosition().x - offsetX;
+        position.y = actor.getPosition().y + verticalDistance;
+        position.z = actor.getPosition().z - offsetZ;
 
         // rotate the camera to always look at the person
         rotation.y = 180 - theta;
@@ -49,6 +66,6 @@ public class ThirdPersonCamera extends Camera {
     }
 
     private void moveHorizontally(float offsetY) {
-        angle -= offsetY;
+        angleAroundActor -= offsetY;
     }
 }

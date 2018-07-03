@@ -4,7 +4,7 @@ import engine.IGameLogic;
 import engine.Engine;
 import game.DemoGame;
 
-public class HelloWorld {
+public class Main {
 
     public static void main(String[] args) {
         try {

@@ -16,6 +16,7 @@ public class MouseInput {
     private boolean inWindow = false;
     private boolean leftButtonPressed = false;
     private boolean rightButtonPressed = false;
+    private float scrollDiff = 0.0f;
 
     public MouseInput() {
         previousPos = new Vector2d(-1, -1);
@@ -34,6 +35,9 @@ public class MouseInput {
         glfwSetMouseButtonCallback(window.getWindowHandle(), (windowHandle, button, action, mode) -> {
             leftButtonPressed = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS;
             rightButtonPressed = button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS;
+        });
+        glfwSetScrollCallback(window.getWindowHandle(), (windowHandle, xoffset, yoffset) -> {
+            scrollDiff = (float) yoffset;
         });
     }
 
@@ -66,5 +70,13 @@ public class MouseInput {
 
     public boolean isRightButtonPressed() {
         return rightButtonPressed;
+    }
+
+    public float getScrollDiff() {
+        return scrollDiff;
+    }
+
+    public void resetScrollDiff() {
+        scrollDiff = 0;
     }
 }
