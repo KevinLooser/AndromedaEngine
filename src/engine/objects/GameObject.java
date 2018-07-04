@@ -16,6 +16,7 @@ public class GameObject {
     protected LifeState lifeState = ALIVE;
 
     protected float speed;
+    protected float maxSpeed;
     protected float acceleration;
     protected float durability;
 
@@ -43,6 +44,7 @@ public class GameObject {
         this.speed = speed;
         this.acceleration = acceleration;
         this.durability = durability;
+        maxSpeed = calculateMaxSpeed();
     }
 
     public enum LifeState {
@@ -64,8 +66,11 @@ public class GameObject {
     }
 
     public void accelerate() {
-        if(speed < acceleration * 100) {
+        if(speed <= calculateMaxSpeed()) {
             speed += acceleration;
+        }
+        if(speed > calculateMaxSpeed()) {
+            speed = calculateMaxSpeed();
         }
     }
 
@@ -74,6 +79,10 @@ public class GameObject {
         if (speed < 0) {
             speed = 0;
         }
+    }
+
+    public float calculateMaxSpeed() {
+        return acceleration * 100;
     }
 
     public void setRadius(float radius) {

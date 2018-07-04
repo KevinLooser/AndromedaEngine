@@ -8,13 +8,15 @@ public class Missile extends GameObject {
     private float damage;
     private float range;
     private Vector3f startPosition;
+    private Ship owner;
 
-    public Missile(Mesh mesh, float radius, float speed, float range, float damage) {
+    public Missile(Mesh mesh, float radius, float speed, float range, float damage, Ship owner) {
         super(mesh, radius);
         super.speed = speed;
         this.damage = damage;
         this.range = range;
         startPosition = new Vector3f(position.x, position.y, position.z);
+        this.owner = owner;
     }
 
     public Missile(Mesh mesh, float radius, float speed, float range, float acceleration, float durability, float damage) {
@@ -30,6 +32,7 @@ public class Missile extends GameObject {
             position.x += (float) Math.sin(Math.toRadians(rotation.y - 90)) * -1.0f * speed;
             position.z += (float) Math.cos(Math.toRadians(rotation.y - 90)) * speed;
         }
+        decelerate();
     }
 
     public boolean isExhausted() {
@@ -47,5 +50,9 @@ public class Missile extends GameObject {
 
     public float getDamage() {
         return damage;
+    }
+
+    public boolean isOwner(Ship owner) {
+        return this.owner == owner;
     }
 }

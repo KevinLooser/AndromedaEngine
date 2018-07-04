@@ -109,7 +109,7 @@ public class Window {
         return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
     }
 
-    public boolean isKeyTyped(int keyCode) {
+    public boolean isKeyReleased(int keyCode) {
         return glfwGetKey(windowHandle, keyCode) == GLFW_RELEASE;
     }
 

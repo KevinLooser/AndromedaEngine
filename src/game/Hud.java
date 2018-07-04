@@ -26,7 +26,7 @@ public class Hud implements IHud {
     public Hud(String statusText) throws Exception {
         fontTexture = new FontTexture(FONT, CHARSET);
         this.statusTextItem = new TextItem(statusText, fontTexture);
-        this.statusTextItem.setPosition(1, 1, 0);
+        this.statusTextItem.setPosition(0, 0, 0);
         this.statusTextItem.getMesh().getMaterial().setAmbientColour(new Vector4f(1, 1, 1, 1));
 
         // Create list that holds the items that compose the HUD
@@ -53,6 +53,6 @@ public class Hud implements IHud {
     }
 
     public void updateSize(Window window) {
-        this.statusTextItem.setPosition(10f, window.getHeight() - 50f, 0);
+        this.statusTextItem.setPosition(10f, window.getHeight() - 35f, 0);
     }
 }

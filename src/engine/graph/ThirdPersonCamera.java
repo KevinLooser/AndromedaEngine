@@ -30,7 +30,7 @@ public class ThirdPersonCamera extends Camera {
         }
 
         float scrollOffset = mouseInput.getScrollDiff();
-        scrollOffset *= 0.3;
+        scrollOffset *= 0.6;
         if(distance >= 3f && distance <= 12f) {
             distance -= scrollOffset;
             if(distance < 3f) {
