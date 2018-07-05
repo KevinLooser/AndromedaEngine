@@ -44,7 +44,7 @@ public class Thruster extends Module {
 
     public void rechargeFuel() {
         // TODO once expired time since last use is calculated properly, set -1 to rechargeDelay
-        if(System.currentTimeMillis() - lastTime > -1) {
+        if(System.currentTimeMillis() - lastTime > rechargeDelay) {
             if(fuel < maxFuel) {
                 fuel += rechargeRate;
             }

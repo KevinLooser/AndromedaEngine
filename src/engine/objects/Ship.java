@@ -62,13 +62,15 @@ public class Ship extends GameObject {
     }
 
     public void stopBoost() {
+        if(boostActive) {
+            thruster.unload();
+        }
         weaponsActive = true;
         boostActive = false;
         acceleration = defaultAcceleration;
         if(speed > calculateMaxSpeed()) {
             decelerate();
         }
-        thruster.unload();
         thruster.rechargeFuel();
     }
 
@@ -78,9 +80,11 @@ public class Ship extends GameObject {
     }
 
     public void stopShield() {
+        if(shieldActive) {
+            shield.unload();
+        }
         weaponsActive = true;
         shieldActive = false;
-        shield.unload();
         shield.rechargeShield();
     }
 

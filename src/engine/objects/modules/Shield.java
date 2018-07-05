@@ -31,7 +31,8 @@ public class Shield extends Module {
 
     public void rechargeShield() {
         // TODO once expired time since last use is calculated properly, set -1 to rechargeDelay
-        if(System.currentTimeMillis() - lastTime > -1) {
+        System.out.println(System.currentTimeMillis() + "                   " + lastTime);
+        if(System.currentTimeMillis() - lastTime > rechargeDelay) {
             if(magnitude < maxShield) {
                 magnitude += rechargeRate;
             }

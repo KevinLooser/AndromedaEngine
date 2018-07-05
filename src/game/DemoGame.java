@@ -68,7 +68,7 @@ public class DemoGame implements IGameLogic {
 
         // skybox
         SkyBox skyBox = new SkyBox("/resources/models/skybox.obj", "/resources/textures/skybox.png");
-        skyBox.setScale(50f);
+        skyBox.setScale(100f);
         scene.setSkyBox(skyBox);
 
         // create game objects
@@ -92,19 +92,94 @@ public class DemoGame implements IGameLogic {
 
         // setup objects
         // TODO read positions and rotations from save file
-        enemyShip.setPosition(0f, 0f, 0f);
+        enemyShip.setPosition(-10f, 0f, 0f);
         enemyShip.setRadius(2f);
-        GameObject asteroid = new Obstacle(mesh, 1f);
-        asteroid.setDurability(6.0f);
-        asteroid.setPosition(-4, 0, 4);
-        ship.setPosition(10f, 0, -cameraDistance);
+        GameObject asteroid1 = new Obstacle(mesh, 1f);
+
+        GameObject asteroid2 = new Obstacle(mesh, 1f);
+        GameObject asteroid3 = new Obstacle(mesh, 1f);
+        GameObject asteroid4 = new Obstacle(mesh, 1f);
+        GameObject asteroid5 = new Obstacle(mesh, 1f);
+        GameObject asteroid6 = new Obstacle(mesh, 1f);
+        GameObject asteroid7 = new Obstacle(mesh, 1f);
+        GameObject asteroid8 = new Obstacle(mesh, 1f);
+        GameObject asteroid9 = new Obstacle(mesh, 1f);
+        GameObject asteroid10 = new Obstacle(mesh, 1f);
+        GameObject asteroid11 = new Obstacle(mesh, 1f);
+        GameObject asteroid12 = new Obstacle(mesh, 1f);
+        GameObject asteroid13 = new Obstacle(mesh, 1f);
+        GameObject asteroid14 = new Obstacle(mesh, 1f);
+        GameObject asteroid15 = new Obstacle(mesh, 1f);
+        GameObject asteroid16 = new Obstacle(mesh, 1f);
+        GameObject asteroid17 = new Obstacle(mesh, 1f);
+        GameObject asteroid18 = new Obstacle(mesh, 1f);
+        GameObject asteroid19 = new Obstacle(mesh, 1f);
+
+        asteroid1.setDurability(6.0f);
+        asteroid1.setPosition(-4f, 0, 2f);
+        asteroid2.setDurability(6.0f);
+        asteroid2.setPosition(-6f, 0, 27f);
+        asteroid3.setDurability(6.0f);
+        asteroid3.setPosition(-8f, 0, 18f);
+        asteroid4.setDurability(6.0f);
+        asteroid4.setPosition(20f, 0, 12f);
+        asteroid5.setDurability(6.0f);
+        asteroid5.setPosition(20f, 0, -14f);
+        asteroid6.setDurability(6.0f);
+        asteroid6.setPosition(8f, 0, -6f);
+        asteroid7.setDurability(6.0f);
+        asteroid7.setPosition(14f, 0, -16f);
+        asteroid8.setDurability(6.0f);
+        asteroid8.setPosition(-20f, 0, -22f);
+        asteroid9.setDurability(6.0f);
+        asteroid9.setPosition(-30f, 0, -10f);
+        asteroid10.setDurability(6.0f);
+        asteroid10.setPosition(-20f, 0, -15f);
+
+        asteroid11.setDurability(6.0f);
+        asteroid11.setPosition(-10f, 10f, -10f);
+        asteroid12.setDurability(6.0f);
+        asteroid12.setPosition(-12f, 6f, 7f);
+        asteroid13.setDurability(6.0f);
+        asteroid13.setPosition(-5f, -10f, 5f);
+        asteroid14.setDurability(6.0f);
+        asteroid14.setPosition(-2f, -20f, 0);
+        asteroid15.setDurability(6.0f);
+        asteroid15.setPosition(9f, -7f, 15f);
+        asteroid16.setDurability(6.0f);
+        asteroid16.setPosition(5f, -11f, -14f);
+        asteroid17.setDurability(6.0f);
+        asteroid17.setPosition(0, 15f, 2f);
+        asteroid18.setDurability(6.0f);
+        asteroid18.setPosition(7f, 14f, -4f);
+        asteroid19.setDurability(6.0f);
+        asteroid19.setPosition(13f, -12f, -9f);
+        ship.setPosition(0, 0, -cameraDistance);
         ship.setRotation(0, 90, 0);
 
         // add game objects
         gameObjects = new ArrayList<>();
         gameObjects.add(ship);
         gameObjects.add(enemyShip);
-        gameObjects.add(asteroid);
+        gameObjects.add(asteroid1);
+        gameObjects.add(asteroid2);
+        gameObjects.add(asteroid3);
+        gameObjects.add(asteroid4);
+        gameObjects.add(asteroid5);
+        gameObjects.add(asteroid6);
+        gameObjects.add(asteroid7);
+        gameObjects.add(asteroid8);
+        gameObjects.add(asteroid9);
+        gameObjects.add(asteroid10);
+        gameObjects.add(asteroid11);
+        gameObjects.add(asteroid12);
+        gameObjects.add(asteroid13);
+        gameObjects.add(asteroid14);
+        gameObjects.add(asteroid15);
+        gameObjects.add(asteroid16);
+        gameObjects.add(asteroid17);
+        gameObjects.add(asteroid18);
+        gameObjects.add(asteroid19);
         gameObjects.add(skyBox);
         scene.setGameObjectsMeshes(gameObjects);
         camera.init(ship, cameraDistance);
@@ -117,7 +192,16 @@ public class DemoGame implements IGameLogic {
 
         // add obstacles
         obstacles = new ObstacleGroup();
-        obstacles.add((Obstacle) asteroid);
+        obstacles.add((Obstacle) asteroid1);
+        obstacles.add((Obstacle) asteroid2);
+        obstacles.add((Obstacle) asteroid3);
+        obstacles.add((Obstacle) asteroid4);
+        obstacles.add((Obstacle) asteroid5);
+        obstacles.add((Obstacle) asteroid6);
+        obstacles.add((Obstacle) asteroid7);
+        obstacles.add((Obstacle) asteroid8);
+        obstacles.add((Obstacle) asteroid9);
+        obstacles.add((Obstacle) asteroid10);
 
         // prepare missiles
         missiles = new MissileGroup();
@@ -169,10 +253,8 @@ public class DemoGame implements IGameLogic {
             }
             if (window.isKeyPressed(GLFW_KEY_A)) {
                 ((Ship) player).steer(-1);
-                System.out.println((float) (Math.cos(player.getRotation().y % 360) * 4f) + "                  " + (float) Math.sin(player.getRotation().y % 360) * 4f);
             } else if (window.isKeyPressed(GLFW_KEY_D)) {
                 ((Ship) player).steer(1);
-                System.out.println((float) (Math.cos(player.getRotation().y % 360) * 4f) + "                  " + (float) Math.sin(player.getRotation().y % 360) * 4f);
             }
             if (window.isKeyPressed(GLFW_KEY_F) && ((Ship) player).isFrontReady() && ((Ship) player).weaponsActive()) {
                 Missile missile = ((Ship) player).shootFrontal();
